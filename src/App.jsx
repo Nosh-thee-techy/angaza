@@ -1,16 +1,22 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import html2canvas from 'html2canvas'
 import {
+  Bot,
+  ChevronRight,
   Copy,
   Download,
   ExternalLink,
+  History,
   ImagePlus,
   Link2,
   Menu,
   MessageCircleMore,
   Plus,
+  Radar,
   SendHorizontal,
   Share2,
+  ShieldCheck,
+  UserCircle2,
   X,
 } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
@@ -335,6 +341,14 @@ function sourceDot(stance) {
   return 'gray'
 }
 
+function historyBadgeLabel(verdict) {
+  if (verdict === 'VERIFIED') return 'VERIFIED'
+  if (verdict === 'FALSE') return 'FALSE'
+  if (verdict === 'DEEPFAKE') return 'MANIPULATED'
+  if (verdict === 'ANSWER') return 'ANSWERED'
+  return 'UNVERIFIED'
+}
+
 function App() {
   const [state, dispatch] = useReducer(reducer, initialState)
   const [input, setInput] = useState('')
@@ -566,8 +580,13 @@ function App() {
       </button>
 
       <aside className={`panel left-panel ${isSidebarOpen ? 'open' : ''}`}>
-        <div>
+        <div className="left-head">
           <h1 className="logo">ANGAZA</h1>
+          <button className="close mobile-only" onClick={() => setIsSidebarOpen(false)}>
+            <X size={14} />
+          </button>
+        </div>
+        <div>
           <p className="tagline">Illuminating truth</p>
         </div>
         <button
@@ -580,6 +599,7 @@ function App() {
         >
           <Plus size={16} /> New Check
         </button>
+        <p className="section-label">RECENT INTELLIGENCE</p>
         <div className="history-list">
           {state.checks.map((check) => (
             <button
@@ -590,8 +610,12 @@ function App() {
               <div className="history-top">
                 <span className={`status-dot ${statusDot(check.verdict)}`} />
                 <p>{check.input.slice(0, 40)}{check.input.length > 40 ? '...' : ''}</p>
+                <ChevronRight size={15} className="history-arrow" />
               </div>
-              <span className="timestamp">{formatAgo(check.timestamp)}</span>
+              <div className="history-meta">
+                <span className="timestamp">{formatAgo(check.timestamp)}</span>
+                <span className="history-badge">{historyBadgeLabel(check.verdict)}</span>
+              </div>
             </button>
           ))}
         </div>
@@ -600,6 +624,12 @@ function App() {
 
       <main className="panel center-panel">
         <header className="top-bar">
+          <div className="brand-left">
+            <button className="icon-btn" onClick={() => setIsSidebarOpen((prev) => !prev)}>
+              <Menu size={16} />
+            </button>
+            <h2 className="mini-logo">ANGAZA</h2>
+          </div>
           <div className="mode-pill">{state.mode === 'qa' ? 'Q&A MODE' : 'VERIFY MODE'}</div>
           <div className="mode-switch">
             <button
@@ -614,6 +644,9 @@ function App() {
             >
               Q&A
             </button>
+          </div>
+          <div className="profile-dot">
+            <UserCircle2 size={18} />
           </div>
         </header>
 
@@ -636,7 +669,7 @@ function App() {
             <article className="bubble-wrap assistant-wrap">
               <div className="avatar">A</div>
               <div className="pipeline-box">
-                <p className="pipeline-title">Analyzing...</p>
+                <p className="pipeline-title">VERIFICATION PIPELINE</p>
                 {activeSteps.map((step, index) => {
                   const stepState =
                     index + 1 < state.currentStep ? 'done' : index + 1 === state.currentStep ? 'active' : 'pending'
@@ -749,6 +782,7 @@ function App() {
               </div>
             </div>
 
+            <p className="forensic-kicker">FORENSIC ANALYSIS</p>
             <h4>What we found</h4>
             <p className="explanation">{state.activeCheck.explanation}</p>
 
@@ -812,13 +846,13 @@ function App() {
 
             <div className="action-row">
               <button onClick={() => setIsShareOpen(true)}>
-                <Share2 size={14} /> Share fact card
+                <Share2 size={14} /> SHARE FACT CARD
               </button>
               <button onClick={focusFollowUp}>
-                <MessageCircleMore size={14} /> Ask a follow-up
+                <MessageCircleMore size={14} /> FOLLOW-UP
               </button>
               <button onClick={copyVerdict}>
-                <Copy size={14} /> Copy verdict
+                <Copy size={14} /> COPY VERDICT
               </button>
             </div>
           </div>
@@ -832,7 +866,10 @@ function App() {
               <X size={16} />
             </button>
             <div ref={shareCardRef} className="share-card">
-              <p className="logo">ANGAZA</p>
+              <div className="share-head">
+                <p className="logo">ANGAZA</p>
+                <p className="share-kicker">ANALYZED BY ANGAZA</p>
+              </div>
               <span className={`badge ${getVerdictClass(state.activeCheck.verdict)}`}>
                 {verdictBadge(state.activeCheck.verdict)}
               </span>
@@ -844,15 +881,34 @@ function App() {
             </div>
             <div className="modal-actions">
               <button onClick={downloadFactCard} disabled={isDownloading}>
-                <Download size={14} /> {isDownloading ? 'Preparing...' : 'Download as image'}
+                <Download size={14} /> {isDownloading ? 'Preparing...' : 'DOWNLOAD AS IMAGE'}
               </button>
               <button onClick={copyDeepLink}>
-                <Link2 size={14} /> Copy link
+                <Link2 size={14} /> COPY LINK
               </button>
             </div>
           </div>
         </div>
       )}
+
+      <nav className="mobile-nav">
+        <button className="active">
+          <ShieldCheck size={14} />
+          VERIFY
+        </button>
+        <button>
+          <History size={14} />
+          HISTORY
+        </button>
+        <button>
+          <Radar size={14} />
+          INTELLIGENCE
+        </button>
+        <button>
+          <Bot size={14} />
+          PROFILE
+        </button>
+      </nav>
     </div>
   )
 }
